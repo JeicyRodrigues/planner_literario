@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Livros Lidos - Capítulo 1</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Montserrat:wght@400;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --marrom: #633535;
+            --vinho: #8b4361;
+            --rosa: #faeeeb;
+            --borda: #b89794;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            min-height: 100vh;
+            background-image: url('imagens/backgroud.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--marrom);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ══ HEADER ══ */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 28px 6px;
+        }
+
+        .logo-link {
+            display: flex; align-items: center;
+            text-decoration: none; flex-shrink: 0;
+            transition: transform 0.3s;
+        }
+        .logo-link:hover { transform: scale(1.05); }
+        .logo-link img { width: 72px; height: auto; }
+
+        .header-titulo {
+            flex: 1; display: flex;
+            flex-direction: column; align-items: center;
+        }
+        .titulo-linha {
+            display: flex; align-items: center;
+            justify-content: center; gap: 4px; width: 100%;
+        }
+        .arabesco {
+            height: 54px; width: auto; object-fit: contain;
+            mix-blend-mode: multiply; opacity: 0.9; flex-shrink: 0;
+        }
+        .arabesco-dir { transform: scaleX(-1); }
+
+        .titulo-pagina {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.5rem; font-weight: 700;
+            color: var(--marrom); line-height: 1; white-space: nowrap;
+        }
+        .subtitulo-header {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.2rem; font-weight: 600;
+            color: var(--vinho); margin-top: 0;
+        }
+
+        .btn-drawer {
+            background: none; border: none;
+            cursor: pointer; padding: 4px; flex-shrink: 0;
+            transition: transform 0.2s;
+        }
+        .btn-drawer:hover { transform: scale(1.1); }
+        .btn-drawer img { width: 52px; height: auto; mix-blend-mode: multiply; }
+
+        /* ══ DRAWER ══ */
+        .drawer-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.35); z-index: 1000;
+        }
+        .drawer-overlay.aberto { display: block; }
+
+        .drawer {
+            position: fixed; top: 0; right: -320px;
+            width: 300px; height: 100vh;
+            background: #faeeeb; border-left: 1px solid var(--borda);
+            z-index: 1001;
+            transition: right 0.35s cubic-bezier(0.4,0,0.2,1);
+            display: flex; flex-direction: column;
+            box-shadow: -4px 0 20px rgba(99,53,53,0.12);
+        }
+        .drawer.aberto { right: 0; }
+        .drawer-header {
+            padding: 20px 22px 15px;
+            border-bottom: 1px solid rgba(184,151,148,0.4);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .drawer-titulo { font-family: 'Dancing Script', cursive; font-size: 1.8rem; color: var(--marrom); }
+        .drawer-fechar {
+            background: none; border: none; font-size: 1.4rem;
+            color: var(--marrom); cursor: pointer; padding: 4px 8px;
+            border-radius: 50%; transition: background 0.2s;
+        }
+        .drawer-fechar:hover { background: rgba(139,67,97,0.12); }
+        .drawer-nav { flex: 1; padding: 15px 0; overflow-y: auto; }
+        .drawer-nav ul { list-style: none; }
+        .drawer-nav li a {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 13px 24px; text-decoration: none;
+            color: var(--marrom); font-size: 0.88rem; font-weight: 600;
+            border-left: 3px solid transparent;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .drawer-nav li a:hover { background: #eededa; border-left-color: var(--vinho); }
+        .drawer-sep { height: 1px; background: rgba(184,151,148,0.3); margin: 8px 20px; }
+        .drawer-footer { padding: 18px 22px; border-top: 1px solid rgba(184,151,148,0.4); font-size: 0.75rem; color: #999; text-align: center; }
+
+        /* ══ CONTAINER PRINCIPAL ══ */
+        .container-biblioteca {
+            background-color: rgba(250, 238, 235, 0.72);
+            backdrop-filter: blur(2px);
+            width: 92%; max-width: 1200px;
+            margin: 4px auto 20px;
+            padding: 28px 32px 30px;
+            border-radius: 18px;
+            border: 1px solid rgba(184,151,148,0.5);
+            flex: 1;
+            min-height: 500px;
+        }
+
+        /* ══ CONTADOR DE LIVROS ══ */
+        .contador-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .contador-texto {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.2rem;
+            color: var(--vinho);
+        }
+        .contador-texto strong {
+            font-size: 1.5rem;
+            color: var(--marrom);
+        }
+        .btn-novo {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 22px;
+            background: var(--marrom); color: white;
+            border-radius: 20px; text-decoration: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem; font-weight: 700;
+            letter-spacing: 0.5px;
+            transition: background 0.2s, transform 0.15s;
+        }
+        .btn-novo:hover { background: var(--vinho); transform: translateY(-1px); }
+
+        /* ══ GRADE DE LIVROS ══ */
+        .livros-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+            align-items: flex-start;
+        }
+
+        /* ══ CARD DO LIVRO ══ */
+        .livro-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 120px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--marrom);
+            transition: transform 0.25s;
+            position: relative;
+        }
+        .livro-card:hover { transform: translateY(-6px); }
+        .livro-card:hover .capa-sombra { box-shadow: 6px 12px 28px rgba(99,53,53,0.35); }
+
+        .capa-wrapper {
+            width: 120px;
+            height: 180px;
+            position: relative;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .capa-sombra {
+            width: 100%; height: 100%;
+            border-radius: 6px;
+            box-shadow: 4px 6px 16px rgba(99,53,53,0.22);
+            transition: box-shadow 0.25s;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Placeholder quando não há imagem */
+        .capa-placeholder {
+            width: 100%; height: 100%;
+            border-radius: 6px;
+            background: linear-gradient(135deg, rgba(184,151,148,0.3), rgba(139,67,97,0.15));
+            border: 1px solid var(--borda);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 6px; color: var(--borda);
+            font-size: 0.65rem; text-align: center;
+            padding: 8px;
+        }
+        .capa-placeholder span { font-size: 2rem; }
+
+        /* Overlay ao passar o mouse */
+        .capa-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(99,53,53,0.55);
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+        .livro-card:hover .capa-overlay { opacity: 1; }
+        .capa-overlay span {
+            color: white; font-size: 0.72rem;
+            font-weight: 700; letter-spacing: 1px;
+            text-align: center; padding: 0 8px;
+        }
+
+        /* Nota em estrelas pequenas sobre a capa */
+        .capa-nota {
+            position: absolute;
+            bottom: 6px; left: 50%;
+            transform: translateX(-50%);
+            display: flex; gap: 1px;
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+        .livro-card:hover .capa-nota { opacity: 1; }
+        .capa-nota span { font-size: 0.75rem; color: #fff; }
+        .capa-nota span.ativa { color: #f5c842; }
+
+        .livro-titulo {
+            margin-top: 8px;
+            font-size: 0.72rem;
+            text-align: center;
+            color: var(--marrom);
+            line-height: 1.4;
+            max-width: 120px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .livro-autor {
+            font-size: 0.62rem;
+            color: var(--borda);
+            text-align: center;
+            margin-top: 2px;
+        }
+
+        /* Emoções miniatura embaixo do título */
+        .livro-emocoes {
+            display: flex; gap: 2px; margin-top: 4px;
+            justify-content: center;
+        }
+        .livro-emocoes img {
+            width: 16px; height: 16px; object-fit: contain;
+        }
+
+        /* ══ ESTADO VAZIO ══ */
+        .estado-vazio {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            min-height: 300px; gap: 14px;
+            color: var(--borda);
+        }
+        .estado-vazio-icone {
+            font-size: 4rem; opacity: 0.5;
+        }
+        .estado-vazio-texto {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem; text-align: center;
+        }
+        .estado-vazio-sub {
+            font-size: 0.82rem; color: var(--borda); text-align: center;
+        }
+        .btn-comecar {
+            margin-top: 8px;
+            padding: 12px 32px;
+            background: var(--marrom); color: white;
+            border-radius: 6px; text-decoration: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem; font-weight: 700;
+            letter-spacing: 1px;
+            transition: background 0.2s;
+        }
+        .btn-comecar:hover { background: var(--vinho); }
+
+        /* ══ RODAPÉ ══ */
+        .citacao-rodape {
+            text-align: right;
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.8rem; color: var(--marrom);
+            margin-top: 28px; padding-top: 14px;
+            border-top: 1px solid rgba(184,151,148,0.35);
+        }
+
+        footer { text-align: center; padding: 14px; font-size: 0.75rem; color: #777; }
+        footer a { color: #777; text-decoration: none; }
+        footer a:hover { color: var(--marrom); }
+    </style>
+</head>
+
+<body>
+
+    <!-- DRAWER -->
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+    <aside class="drawer" id="drawer">
+        <div class="drawer-header">
+            <span class="drawer-titulo">Menu</span>
+            <button class="drawer-fechar" id="drawerFechar">✕</button>
+        </div>
+        <nav class="drawer-nav">
+            <ul>
+                <li><a href="registro.html"><span>Nova Resenha</span><span>›</span></a></li>
+                <li><a href="biblioteca.html"><span>Livros Lidos</span><span>›</span></a></li>
+                <div class="drawer-sep"></div>
+                <li><a href="#"><span>Metas</span><span>›</span></a></li>
+                <li><a href="#"><span>Calendário</span><span>›</span></a></li>
+                <li><a href="#"><span>Ranking</span><span>›</span></a></li>
+                <li><a href="#"><span>Desafios</span><span>›</span></a></li>
+                <div class="drawer-sep"></div>
+                <li><a href="index.html"><span>Início</span><span>›</span></a></li>
+            </ul>
+        </nav>
+        <div class="drawer-footer">Capítulo 1 © 2026</div>
+    </aside>
+
+    <!-- HEADER -->
+    <header class="page-header">
+        <a href="index.html" class="logo-link" title="Início">
+            <img src="imagens/logo01.png" alt="Capítulo 1">
+        </a>
+        <div class="header-titulo">
+            <div class="titulo-linha">
+                <img src="imagens/arabesco1.PNG" alt="" class="arabesco">
+                <span class="titulo-pagina">Meus livros lidos</span>
+                <img src="imagens/arabesco2.PNG" alt="" class="arabesco arabesco-dir">
+            </div>
+            <span class="subtitulo-header">Onde cada livro vira memória ↩</span>
+        </div>
+        <button class="btn-drawer" id="btnDrawer" title="Menu">
+            <img src="imagens/icone.png" alt="Menu">
+        </button>
+    </header>
+
+    <!-- CONTEÚDO -->
+    <div class="container-biblioteca">
+
+        <!-- Estado vazio (oculto por padrão) -->
+        <div class="estado-vazio" id="estadoVazio" style="display:none;">
+            <div class="estado-vazio-icone">📚</div>
+            <div class="estado-vazio-texto">Sua biblioteca está vazia ainda...</div>
+            <div class="estado-vazio-sub">Que tal registrar seu primeiro livro?</div>
+            <a href="registro.html" class="btn-comecar">+ Registrar um livro</a>
+        </div>
+
+        <!-- Barra de contador (visível quando há livros) -->
+        <div class="contador-bar" id="contadorBar" style="display:none;">
+            <div class="contador-texto">
+                Você já leu <strong id="totalLivros">0</strong> livro(s) 📚
+            </div>
+            <a href="registro.html" class="btn-novo">+ Novo livro</a>
+        </div>
+
+        <!-- Grade de capas -->
+        <div class="livros-grid" id="livrosGrid"></div>
+
+        <!-- Citação rodapé -->
+        <div class="citacao-rodape" id="citacaoRodape" style="display:none;">
+            "Livros são sonhos que seguramos com as mãos."<br>— Neil Gaiman
+        </div>
+
+    </div>
+
+    <footer>
+        <p><a href="#">Sobre Nós</a> | <a href="#">Contato</a> | <a href="#">Privacidade</a> | <a href="#">Termos</a></p>
+    </footer>
+
+    <script>
+        // ── DRAWER ──
+        const btnDrawer = document.getElementById('btnDrawer');
+        const drawer = document.getElementById('drawer');
+        const drawerOverlay = document.getElementById('drawerOverlay');
+        const drawerFechar = document.getElementById('drawerFechar');
+
+        btnDrawer.addEventListener('click', () => {
+            drawer.classList.add('aberto');
+            drawerOverlay.classList.add('aberto');
+            document.body.style.overflow = 'hidden';
+        });
+        const fecharDrawer = () => {
+            drawer.classList.remove('aberto');
+            drawerOverlay.classList.remove('aberto');
+            document.body.style.overflow = '';
+        };
+        drawerFechar.addEventListener('click', fecharDrawer);
+        drawerOverlay.addEventListener('click', fecharDrawer);
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharDrawer(); });
+
+        // ── MAPA DE EMOÇÕES ──
+        const EMOCOES = {
+            amei:      'imagens/emo1.png',
+            chorei:    'imagens/emo2.png',
+            gargalhei: 'imagens/emo3.png',
+            impactada: 'imagens/emo4.png',
+            gelei:     'imagens/emo5.png',
+        };
+
+        // ── RENDERIZA ESTRELAS ──
+        function estrelasHTML(nota) {
+            let html = '';
+            for (let i = 1; i <= 5; i++) {
+                html += `<span class="${i <= parseInt(nota || 0) ? 'ativa' : ''}">★</span>`;
+            }
+            return html;
+        }
+
+        // ── RENDERIZA GRADE ──
+        function renderBiblioteca() {
+            const livros = JSON.parse(localStorage.getItem('livros_lidos') || '[]');
+            const grid = document.getElementById('livrosGrid');
+            const estadoVazio = document.getElementById('estadoVazio');
+            const contadorBar = document.getElementById('contadorBar');
+            const citacaoRodape = document.getElementById('citacaoRodape');
+
+            if (livros.length === 0) {
+                estadoVazio.style.display = 'flex';
+                return;
+            }
+
+            // Mostra contador e citação
+            contadorBar.style.display = 'flex';
+            citacaoRodape.style.display = 'block';
+            document.getElementById('totalLivros').textContent = livros.length;
+
+            // Renderiza cada livro — do mais recente ao mais antigo
+            [...livros].reverse().forEach(livro => {
+                const card = document.createElement('a');
+                card.href = `resenha.html?id=${livro.id}`;
+                card.className = 'livro-card';
+                card.title = livro.titulo;
+
+                // Monta conteúdo da capa
+                let capaConteudo = '';
+                const imgUrl = (livro.imagem_url || '').trim();
+                if (imgUrl) {
+                    capaConteudo = `
+                        <img src="${imgUrl}" alt="${livro.titulo}" class="capa-sombra"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="capa-placeholder" style="display:none;"><span>📚</span>${livro.titulo}</div>`;
+                } else {
+                    capaConteudo = `<div class="capa-placeholder"><span>📚</span>${livro.titulo}</div>`;
+                }
+
+                // Estrelinhas no hover
+                const estrelas = estrelasHTML(livro.nota);
+
+                // Emoções miniatura
+                let emocoesHTML = '';
+                if (livro.emocao) {
+                    livro.emocao.split(',').forEach(e => {
+                        const src = EMOCOES[e.trim()];
+                        if (src) emocoesHTML += `<img src="${src}" alt="${e.trim()}">`;
+                    });
+                }
+
+                card.innerHTML = `
+                    <div class="capa-wrapper">
+                        ${capaConteudo}
+                        <div class="capa-overlay"><span>Ver Resenha</span></div>
+                        <div class="capa-nota">${estrelas}</div>
+                    </div>
+                    <div class="livro-titulo">${livro.titulo}</div>
+                    ${livro.autor ? `<div class="livro-autor">${livro.autor}</div>` : ''}
+                    ${emocoesHTML ? `<div class="livro-emocoes">${emocoesHTML}</div>` : ''}
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        renderBiblioteca();
+    </script>
+
+</body>
+</html>
